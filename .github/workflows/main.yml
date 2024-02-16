@@ -36,7 +36,7 @@ jobs:
       - name: Docker build and push to ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: $GITHUB_REPOSITORY
+          ECR_REPOSITORY: ${{ $GITHUB_REPOSITORY }}
           IMAGE_TAG: ${{ steps.git-tag.outputs.version }}
         run: |
           docker build -t $ECR_REPOSITORY .
