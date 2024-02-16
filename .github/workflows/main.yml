@@ -23,16 +23,23 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Automatic Tagging
-        id: increment-git-tag
+        id: git-tag
         run: |
-          bash ./scripts/git-update.sh -v patch
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git config user.name "$GITHUB_ACTOR"
+          npm version minor -m "v%s"
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          git tag ${VERSION}
+          git push "https://$GITHUB_ACTOR:${{ secrets.ACCESS_TOKEN }}@github.com/$GITHUB_REPOSITORY.git" --follow-tags
+          git push "https://$GITHUB_ACTOR:${{ secrets.ACCESS_TOKEN }}@github.com/$GITHUB_REPOSITORY.git" --tags
 
       - name: Build, Tag and Push Image to ECR
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: gha
-          IMAGE_TAG: ${{ steps.increment-git-tag.outputs.new-version }}
+          IMAGE_TAG: ${{ steps.git-tag.outputs.version }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
