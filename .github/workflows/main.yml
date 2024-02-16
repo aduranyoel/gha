@@ -32,7 +32,6 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           git tag ${VERSION}
           git push "https://$GITHUB_ACTOR:${{ secrets.ACCESS_TOKEN }}@github.com/$GITHUB_REPOSITORY.git" --follow-tags
-          git push "https://$GITHUB_ACTOR:${{ secrets.ACCESS_TOKEN }}@github.com/$GITHUB_REPOSITORY.git" --tags
 
       - name: Build, Tag and Push Image to ECR
         id: build-image
