@@ -1,7 +1,8 @@
 name: Build and Push Image to AWS ECR
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 jobs:
   build-and-push:
     name: Build and Push to ECR
@@ -21,12 +22,17 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Automatic Tagging
+        id: increment-git-tag
+        run: |
+          bash ./scripts/git-update.sh -v patch
+
       - name: Build, Tag and Push Image to ECR
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: gha
-          IMAGE_TAG: latest
+          IMAGE_TAG: ${{ steps.increment-git-tag.outputs.new-version }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
