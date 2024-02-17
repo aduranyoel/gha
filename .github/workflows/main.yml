@@ -1,11 +1,11 @@
-name: Build and Push Image to AWS ECR
+name: Build and push image to AWS ECR
 on:
   push:
     branches:
       - main
 jobs:
-  build-and-push:
-    name: Build and Push to ECR
+  build-and-push-to-ecr:
+    name: Build and push to ECR
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,7 +22,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Create Git Tag
+      - name: Create Git tag
         id: git-tag
         run: |
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
@@ -37,9 +37,10 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ steps.git-tag.outputs.version }}
+          ECR_REPOSITORY: gha
         run: |
-          docker build -t $GITHUB_REPOSITORY .
-          docker tag $GITHUB_REPOSITORY:latest $ECR_REGISTRY/$GITHUB_REPOSITORY:$IMAGE_TAG
-          docker tag $GITHUB_REPOSITORY:latest $ECR_REGISTRY/$GITHUB_REPOSITORY:latest
-          docker push $ECR_REGISTRY/$GITHUB_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$$GITHUB_REPOSITORY:latest
+          docker build -t $ECR_REPOSITORY .
+          docker tag $ECR_REPOSITORY:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag $ECR_REPOSITORY:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$$ECR_REPOSITORY:latest
