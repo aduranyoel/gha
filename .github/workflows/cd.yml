@@ -1,12 +1,18 @@
+#on:
+#  push:
+#    branches:
+#      - main
 name: Build and push image to AWS ECR
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: [Node.js CI]
+    types: [completed]
+    branches: [main]
 jobs:
-  build-and-push-to-ecr:
+  on-success:
     name: Build and push to ECR
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -43,3 +49,13 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - name: Catch error
+        env:
+          DESCRIPTION: ${{ github.event.description }}
+        run: |
+          echo CI workflow failed: $DESCRIPTION
