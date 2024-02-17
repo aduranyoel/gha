@@ -40,7 +40,10 @@ jobs:
           IMAGE_TAG: ${{ steps.git-tag.outputs.version }}
           ECR_REPOSITORY: gha
         run: |
-          docker build -t $ECR_REPOSITORY .
+          echo "repo name: $ECR_REPOSITORY"
+          echo "img tag: $IMAGE_TAG"
+          echo "registry: $ECR_REGISTRY"
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker tag $ECR_REPOSITORY $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker tag $ECR_REPOSITORY $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
