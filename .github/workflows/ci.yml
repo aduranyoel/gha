@@ -1,7 +1,10 @@
-name: Node.js CI
-on: [push]
+name: Integrity
+on:
+  push:
+    branches-ignore:
+      - main
 jobs:
-  build:
+  integrity-checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
