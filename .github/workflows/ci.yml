@@ -1,6 +1,7 @@
 name: Integrity
 on:
-  push:
+  workflow_dispatch:
+#  push:
     branches-ignore:
       - main
 jobs:
